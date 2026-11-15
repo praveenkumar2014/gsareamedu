@@ -157,3 +157,7 @@ The admin command creates a new account, not an elevation of an existing email. 
 ## Planning and launch readiness
 
 See [the master checklist](docs/MASTER-CHECKLIST.md) for prioritized tasks, current status and launch gates, and [the Phase 0 audit](docs/PHASE-0-AUDIT.md) for evidence and open risks. The existing slice is not production-ready. It supports plain-text lessons but does not process payments, deliver assignments or provide real course content by default.
+
+## Reconciliation with the earlier main branch
+
+The earlier public-only root `src/app` scaffold and its handover documents are retained for reference. The active application and npm scripts use `apps/web`; the root scaffold is not deployed by those scripts. The previous main README and its flat ESLint config are preserved in [docs/MAIN-BASELINE.md](docs/MAIN-BASELINE.md) and `docs/legacy-eslint.config.mjs`; the active app uses the root `.eslintrc.json`. The root Dockerfile and CI target the active application; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) before deployment. The earlier Vercel and Coolify instructions have not been verified for this monorepo.

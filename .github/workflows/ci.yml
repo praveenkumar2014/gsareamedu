@@ -1,0 +1,60 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: guidesoft_test
+          POSTGRES_USER: guidesoft
+          POSTGRES_PASSWORD: ci_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U guidesoft -d guidesoft_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://guidesoft:ci_test_password@127.0.0.1:5432/guidesoft_test
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-secret-not-for-production-use-123456
+      TEST_ADMIN_EMAIL: ci-admin@example.test
+      TEST_ADMIN_PASSWORD: ci-only-admin-password-123
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run db:validate
+      - run: npm run db:migrate
+      - run: npm test
+      - run: npm run build
+      - name: Prepare test administrator
+        run: npm run admin:create
+        env:
+          ADMIN_NAME: CI Admin
+          ADMIN_EMAIL: ci-admin@example.test
+          ADMIN_PASSWORD: ci-only-admin-password-123
+      - run: npx playwright install --with-deps chromium
+      - name: End-to-end journey
+        run: |
+          npm start > /tmp/guidesoft-web.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/api/health > /dev/null; then break; fi
+            if [ "$i" -eq 60 ]; then cat /tmp/guidesoft-web.log; exit 1; fi
+            sleep 1
+          done
+          npm run test:e2e
