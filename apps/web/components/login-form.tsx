@@ -1,0 +1,6 @@
+'use client';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Notice } from '../../../packages/ui';
+export function LoginForm() {const [busy,setBusy]=useState(false);const [error,setError]=useState(''); const router=useRouter(); return <form className="card mt-8 space-y-5" onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');const data=new FormData(e.currentTarget);try {const result=await signIn('credentials',{email:data.get('email'),password:data.get('password'),redirect:false});if(result?.ok){router.push('/portal');router.refresh();}else setError('Unable to sign in. Check your details or try again later.');}catch{setError('Sign-in is unavailable. Please try again.');}finally{setBusy(false);}}}>{error && <Notice kind="error">{error}</Notice>}<label className="label">Email<input className="field" type="email" name="email" autoComplete="email" required maxLength={254}/></label><label className="label">Password<input className="field" type="password" name="password" autoComplete="current-password" required maxLength={72}/></label><button className="button" disabled={busy}>{busy?'Signing in…':'Sign in'}</button></form>}

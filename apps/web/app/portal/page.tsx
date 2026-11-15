@@ -1,0 +1,10 @@
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { eq, desc } from 'drizzle-orm';
+import { db } from '../../lib/db';
+import { currentUser } from '../../lib/auth';
+import { enrollments, programs } from '../../lib/schema';
+import { areaNames } from '../../../../packages/contracts';
+import { Notice } from '../../../../packages/ui';
+export const dynamic='force-dynamic';
+export default async function Portal({searchParams}:{searchParams:Promise<{status?:string}>}) {const user=await currentUser();if(!user) redirect('/login'); if(user.role==='ADMIN') redirect('/admin'); const {status}=await searchParams; const items=await db.select({id:enrollments.id,programId:programs.id,title:programs.title,description:programs.description,area:programs.area}).from(enrollments).innerJoin(programs,eq(enrollments.programId,programs.id)).where(eq(enrollments.userId,user.id)).orderBy(desc(enrollments.createdAt));return <div className="container-site py-16"><p className="eyebrow">Your learning</p><h1 className="mt-3 text-4xl font-semibold">Welcome, {user.name}.</h1><p className="mt-4 text-slate-600">Your enrolled programs are collected here.</p><div className="mt-8">{status==='enrolled' && <Notice kind="success">You’re enrolled. Your program is listed below.</Notice>}{status==='exists' && <Notice>You’re already enrolled in that program.</Notice>}</div><div className="mt-6 grid gap-5 md:grid-cols-2">{items.map(item=><article key={item.id} className="card"><p className="eyebrow">{areaNames[item.area]}</p><h2 className="mt-3 text-xl font-semibold">{item.title}</h2><p className="mt-3 whitespace-pre-wrap text-slate-600">{item.description}</p><Link prefetch={false} href={`/portal/programs/${item.programId}`} className="mt-5 inline-block font-semibold text-teal underline">View lessons<span className="sr-only"> for {item.title}</span></Link></article>)}</div>{items.length===0 && <div className="mt-6"><Notice>No enrolments yet. <Link href="/programs" className="font-semibold underline">Explore programs</Link>.</Notice></div>}</div>}

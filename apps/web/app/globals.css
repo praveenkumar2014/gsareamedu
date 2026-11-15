@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base { body { @apply bg-cream text-ink antialiased; } a { @apply underline-offset-4; } :focus-visible { outline: 3px solid #c57918; outline-offset: 3px; } }
+@layer components { .container-site { @apply mx-auto max-w-6xl px-5 sm:px-8; } .eyebrow { @apply text-xs font-bold uppercase tracking-[0.18em] text-teal; } .button { @apply inline-flex items-center justify-center rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal disabled:cursor-wait disabled:opacity-60; } .field { @apply mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-ink; } .label { @apply block text-sm font-semibold; } .card { @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm; } }

@@ -1,0 +1,3 @@
+# API and contracts
+
+This slice uses Next.js server actions rather than a public REST API for registration, lead submission, program management, enquiry status, enrolment, lesson management and completion. Inputs are validated using `packages/contracts` and permissions are checked on the server. Some actions use redirects for feedback; admin management uses server action return states. Neither contains secrets. Auth.js handles `/api/auth/*`, including CSRF-protected credentials login and sign-out. `GET /api/health` returns `{status: "ok"}` when the database responds, or 503 `{status: "unavailable"}`. No public API stability guarantee or external integrations are provided.

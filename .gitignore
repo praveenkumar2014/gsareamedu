@@ -4,6 +4,10 @@ out
 .env
 .env.*
 !.env.example
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
 .vercel
 .DS_Store
 *.log

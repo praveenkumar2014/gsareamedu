@@ -1,5 +1,7 @@
 # Implementation status
 
+> Historical main-branch snapshot, retained during reconciliation. Its implementation and release statements describe the earlier public-only scaffold, not the current monorepo. See [MASTER-CHECKLIST.md](MASTER-CHECKLIST.md) for current status and release blockers.
+
 ## Repository audit
 - Default branch: main
 - Starting content: README only; no application source, package manifest, workflow, or existing tracked app files.

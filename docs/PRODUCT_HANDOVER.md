@@ -1,5 +1,7 @@
 # GUIDESOFT Education & AI — Product handover
 
+> Historical main-branch snapshot, retained during reconciliation. Its implementation and release statements describe the earlier public-only scaffold, not the current monorepo. See [MASTER-CHECKLIST.md](MASTER-CHECKLIST.md) for current status and release blockers.
+
 ## Product promise
 A connected learning journey: discover a goal, choose a structured program, practice through projects, receive feedback, demonstrate capability and keep progressing.
 

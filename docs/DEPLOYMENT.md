@@ -1,0 +1,5 @@
+# Deployment
+
+Local setup is in README. Compose publishes PostgreSQL only to loopback; volumes persist until deliberately removed. Do not use example secrets in a real environment. Use a URL-safe database password or correctly percent-encode it in DATABASE_URL. Run migrations once as a controlled release step before starting application traffic; Compose does not auto-migrate. `docker compose up --build web` builds the image. The Dockerfile is intentionally simple rather than optimized; migration CLI requires dev dependencies.
+
+For Coolify, use the Dockerfile at `infra/docker/Dockerfile`, provide a managed PostgreSQL URL and Auth.js variables in the secret store, configure the public HTTPS URL and proxy, and check `/api/health`. Use one migration job before rolling out the app. No live deployment, Docker build, proxy or VPS audit was performed in this environment. Before deployment audit existing services, ports, firewall, storage and backups; preserve all volumes. Establish encrypted backups, recovery point objectives and test restores in isolation. Review security gaps before any public launch.
