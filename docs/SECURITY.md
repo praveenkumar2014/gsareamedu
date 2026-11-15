@@ -1,0 +1,9 @@
+# Security and privacy
+
+Auth.js v4 credentials uses encrypted JWT sessions (8-hour expiry), HTTP-only cookies, CSRF protections, and bcrypt cost 12. Protected actions re-read the role from the database; self-registration is learner-only. Login failures are limited by email after five attempts for 15 minutes. This is not an IP/distributed rate limiter; account lockout can be abused and the table needs retention cleanup. Registration and enquiry endpoints have no rate limiting or anti-spam protection. Require a trusted reverse proxy/WAF with rate limits before Internet exposure.
+
+No email verification, password reset, MFA, session revocation or account lifecycle UI is provided. JWT sessions remain valid until expiry even after password changes; role changes are effective on the next protected request. No production launch should occur until these gaps, privacy notices/consent, retention/deletion, backup encryption, incident response, and owner-approved access policies are addressed. Do not store payment details. TLS must terminate at a trusted proxy; set the exact HTTPS NEXTAUTH_URL and a unique high-entropy NEXTAUTH_SECRET. Protect `.env`, admin bootstrap credentials, database access and logs. Audit records avoid passwords and lead contents but are not immutable or tamper-evident; restrict database access and export to protected storage for production.
+
+The security check includes npm audit, source/secret review and automated accessibility checks, not a penetration test. See acceptance results for environment limitations.
+
+Published lesson reads and completion writes require a current learner account and matching persisted enrolment; draft lessons are not shown to learners. Content is rendered as plain text. This is not a paid-entitlement system: the current enrolment flow does not charge or verify payment. Do not use it for paid courses until entitlement and payment controls are implemented and reviewed.

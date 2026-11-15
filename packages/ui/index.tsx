@@ -1,0 +1,3 @@
+import type { ReactNode } from 'react';
+export function SectionHeading({eyebrow,title,children}:{eyebrow:string;title:string;children?:ReactNode}) { return <div className="max-w-2xl"><p className="eyebrow">{eyebrow}</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>{children && <p className="mt-4 leading-7 text-slate-600">{children}</p>}</div>; }
+export function Notice({children,kind='info'}:{children:ReactNode;kind?:'info'|'error'|'success'}) {return <p role={kind==='error'?'alert':'status'} className={`rounded-xl border p-4 text-sm ${kind==='error'?'border-red-200 bg-red-50 text-red-800':kind==='success'?'border-emerald-200 bg-emerald-50 text-emerald-800':'border-slate-200 bg-slate-50 text-slate-700'}`}>{children}</p>}

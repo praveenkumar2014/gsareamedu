@@ -130,3 +130,30 @@ A feature is done only when its permissions, validation, persistence, error stat
 - ROADMAP.md — phased execution plan
 - ACCEPTANCE-TESTS.md — testable release criteria
 - RESEARCH-MAP.md — market validation and evidence to collect
+
+## Implemented baseline and quick start
+
+The original handover above describes the product vision, not a claim that all phases are complete. This repository now contains a modular Next.js application, Drizzle/PostgreSQL schema and migration, Auth.js credentials sessions, published program catalogue, enquiries, learner registration and enrolment, an admin overview, plain-text lessons and saved learner completion. No payment, assignments, placement, certificates or external integrations are implied. See [docs/ROADMAP.md](docs/ROADMAP.md) for scope and release gaps.
+
+Requirements: Node 22, npm, Docker Compose. Copy `.env.example` to `.env`, replace the password in both `POSTGRES_PASSWORD` and `DATABASE_URL` (use URL-safe characters), and generate a unique `NEXTAUTH_SECRET` with `openssl rand -base64 32`. For local shell commands load the file with `set -a; . ./.env; set +a` (Next.js is rooted in `apps/web`, so the root `.env` is not automatically loaded). Then:
+
+```sh
+docker compose up -d postgres
+npm ci
+npm run db:migrate
+npm run db:validate
+npm run dev
+```
+
+Open http://localhost:3000. The catalogue is intentionally empty until an administrator publishes a program. Create the first admin once, using a secure environment or secret manager, not command history:
+
+```sh
+# Supply ADMIN_NAME, ADMIN_EMAIL and ADMIN_PASSWORD in the environment securely.
+npm run admin:create
+```
+
+The admin command creates a new account, not an elevation of an existing email. Passwords must be 12–72 characters and no more than 72 UTF-8 bytes. See [deployment](docs/DEPLOYMENT.md) and [security](docs/SECURITY.md) before exposing the service publicly. For checks, run `npm run typecheck`, `npm run lint`, `npm run build`, `npm test` with a **dedicated migrated test database**, and `npm run test:e2e` with a running server, Playwright Chromium installed, and `TEST_ADMIN_EMAIL`/`TEST_ADMIN_PASSWORD` set. The end-to-end test creates records in that database; never run it against production.
+
+## Planning and launch readiness
+
+See [the master checklist](docs/MASTER-CHECKLIST.md) for prioritized tasks, current status and launch gates, and [the Phase 0 audit](docs/PHASE-0-AUDIT.md) for evidence and open risks. The existing slice is not production-ready. It supports plain-text lessons but does not process payments, deliver assignments or provide real course content by default.

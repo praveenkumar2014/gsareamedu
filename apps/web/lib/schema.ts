@@ -1,0 +1,15 @@
+import { pgTable, pgEnum, text, timestamp, boolean, integer, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import { randomUUID } from 'crypto';
+const id = () => text('id').primaryKey().$defaultFn(() => randomUUID());
+const created = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
+export const role = pgEnum('role', ['LEARNER','INSTRUCTOR','MENTOR','EMPLOYER','ADMIN']);
+export const area = pgEnum('area', ['ACADEMY','AI_SCHOOL','CAREER','LABS','ENTERPRISE','MARKETPLACE','CERTIFICATION']);
+export const leadStatus = pgEnum('lead_status', ['NEW','CONTACTED','CLOSED']);
+export const users = pgTable('users', { id:id(), name:text('name').notNull(), email:text('email').notNull().unique(), passwordHash:text('password_hash').notNull(), role:role('role').notNull().default('LEARNER'), createdAt:created() });
+export const programs = pgTable('programs', { id:id(), title:text('title').notNull(), description:text('description').notNull(), area:area('area').notNull(), published:boolean('published').notNull().default(false), createdAt:created() });
+export const leads = pgTable('leads', { id:id(), name:text('name').notNull(), email:text('email').notNull(), message:text('message').notNull(), status:leadStatus('status').notNull().default('NEW'), createdAt:created() });
+export const enrollments = pgTable('enrollments', { id:id(), userId:text('user_id').notNull().references(() => users.id), programId:text('program_id').notNull().references(() => programs.id), createdAt:created() }, t => [uniqueIndex('enrollment_user_program').on(t.userId,t.programId)]);
+export const auditEvents = pgTable('audit_events', { id:id(), actorId:text('actor_id').references(() => users.id, {onDelete:'set null'}), action:text('action').notNull(), target:text('target').notNull(), createdAt:created() }, t => [index('audit_created').on(t.createdAt)]);
+export const loginAttempts = pgTable('login_attempts', { email:text('email').primaryKey(), failures:integer('failures').notNull().default(0), lockedUntil:timestamp('locked_until', {withTimezone:true}), updatedAt:timestamp('updated_at', {withTimezone:true}).notNull().defaultNow() });
+export const lessons = pgTable('lessons', { id:id(), programId:text('program_id').notNull().references(() => programs.id), title:text('title').notNull(), content:text('content').notNull(), position:integer('position').notNull(), published:boolean('published').notNull().default(false), createdAt:created() }, t => [index('lessons_program').on(t.programId)]);
+export const lessonProgress = pgTable('lesson_progress', { id:id(), userId:text('user_id').notNull().references(() => users.id), lessonId:text('lesson_id').notNull().references(() => lessons.id), completedAt:timestamp('completed_at', {withTimezone:true}).notNull().defaultNow() }, t => [uniqueIndex('lesson_progress_user_lesson').on(t.userId,t.lessonId)]);

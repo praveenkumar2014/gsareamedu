@@ -1,0 +1,9 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import { registrationSchema, leadSchema, programSchema, programFormSchema, leadStatusSchema, lessonFormSchema, areas } from '../packages/contracts';
+test('registration normalizes email and enforces safe password length',()=>{assert.equal(registrationSchema.parse({name:'  Ada  ',email:' ADA@example.com ',password:'long-password-123'}).email,'ada@example.com'); assert.equal(registrationSchema.safeParse({name:'Ada',email:'a@b.com',password:'short'}).success,false); assert.equal(registrationSchema.safeParse({name:'Ada',email:'a@b.com',password:'🔑'.repeat(20)}).success,false);});
+test('lead and program inputs are validated',()=>{assert.equal(leadSchema.safeParse({name:'A',email:'bad',message:'hi'}).success,false);assert.equal(programSchema.safeParse({title:'Program',description:'A useful program description',area:'BAD'}).success,false); assert.equal(areas.length,7);});
+
+test('admin program visibility and enquiry statuses reject unrecognized values',()=>{const program={title:'Practical learning',description:'A useful program description',area:'ACADEMY'}; assert.equal(programFormSchema.safeParse({...program,visibility:'draft'}).success,true); assert.equal(programFormSchema.safeParse({...program,visibility:'hidden'}).success,false); assert.equal(leadStatusSchema.safeParse('CONTACTED').success,true); assert.equal(leadStatusSchema.safeParse('DELETED').success,false);});
+
+test('lesson fields require valid content, order and visibility',()=>{const lesson={title:'Lesson one',content:'This lesson has useful content.',position:'1',visibility:'published'};assert.equal(lessonFormSchema.parse(lesson).position,1);assert.equal(lessonFormSchema.safeParse({...lesson,content:'short'}).success,false);assert.equal(lessonFormSchema.safeParse({...lesson,position:'0'}).success,false);assert.equal(lessonFormSchema.safeParse({...lesson,visibility:'other'}).success,false);});
